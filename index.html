@@ -44,14 +44,24 @@ let hexRadius = 200;
 let rotation = 0;
 let rotationSpeed = 0.01;
 const gravity = 0.2;
+const maxSpeed = 20;
 
 let ball = {
-  x: (Math.random() - 0.5) * 50, // Random X start
-  y: (Math.random() - 0.5) * 50, // Random Y start
+  x: (Math.random() - 0.5) * 50,
+  y: (Math.random() - 0.5) * 50,
   radius: 10,
-  vx: (Math.random() - 0.5) * 4, // Random X velocity
-  vy: 0
+  vx: (Math.random() - 0.5) * 4 + (Math.random() - 0.5), // extra randomness
+  vy: (Math.random() - 0.5) * 4 + (Math.random() - 0.5)  // extra randomness
 };
+
+function clampVelocity(max) {
+  const speed = Math.hypot(ball.vx, ball.vy);
+  if (speed > max) {
+    const scale = max / speed;
+    ball.vx *= scale;
+    ball.vy *= scale;
+  }
+}
 
 function getHexagonVertices(center, radius, angleOffset = 0) {
   const vertices = [];
@@ -124,6 +134,8 @@ function update() {
 
   ball.x += ball.vx;
   ball.y += ball.vy;
+
+  clampVelocity(maxSpeed);
 
   rotation += rotationSpeed;
 
