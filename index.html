@@ -1,30 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
-<!DOCTYPE html>
-<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Hexagon Bounce with Gravity</title>
-  <style>
-    body {
-      margin: 0;
-      background: #111;
-      overflow: hidden;
-    }
-    canvas {
-      display: block;
-    }
-  </style>
-</head>
-<body>
-<canvas id="gameCanvas"></canvas>
-<audio id="bounceSound" src="bounce.wav" preload="auto"></audio>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Hexagon Bounce with Gravity</title>
+  <title>Hexagon Bounce</title>
   <style>
     body {
       margin: 0;
@@ -43,11 +21,10 @@
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d');
 
-// Sound setup with try/catch so it doesn't crash if missing
 let bounceSound;
 try {
   bounceSound = new Audio("bounce.wav");
-  bounceSound.volume = 0.35;
+  bounceSound.volume = 0.5;
 } catch (e) {
   bounceSound = null;
 }
@@ -67,14 +44,13 @@ let hexRadius = 200;
 let rotation = 0;
 let rotationSpeed = 0.01;
 const gravity = 0.2;
-const bounceLoss = 0.75;
 
 let ball = {
-  x: 0,
-  y: 0,
+  x: (Math.random() - 0.5) * 50, // Random X start
+  y: (Math.random() - 0.5) * 50, // Random Y start
   radius: 10,
-  vx: 2,
-  vy: 0,
+  vx: (Math.random() - 0.5) * 4, // Random X velocity
+  vy: 0
 };
 
 function getHexagonVertices(center, radius, angleOffset = 0) {
@@ -106,28 +82,21 @@ function reflectBall(normal) {
   ball.vx -= 2 * dot * normal.x;
   ball.vy -= 2 * dot * normal.y;
 
-  // Identify if it's a bounce off the "floor" (mostly vertical)
   const verticalBounce = Math.abs(normal.y) > 0.9;
-
   if (verticalBounce) {
-    // Ensure strong upward bounce if it’s weak
-    const minBounce = 6;
+    const minBounce = 5;
     if (Math.abs(ball.vy) < minBounce) {
       ball.vy = -minBounce;
     }
   } else {
-    // Still reflect, but allow some horizontal energy loss
     ball.vx *= 0.98;
   }
 
-  // Play sound if available
   if (bounceSound) {
     bounceSound.currentTime = 0;
     bounceSound.play().catch(() => {});
   }
 }
-
-
 
 function isBallCollidingWithEdge(p1, p2) {
   const edgeDX = p2.x - p1.x;
@@ -172,7 +141,6 @@ function draw() {
   const vertices = getHexagonVertices(center, hexRadius, rotation);
   drawHexagon(vertices);
 
-  // Draw ball
   ctx.beginPath();
   ctx.arc(center.x + ball.x, center.y + ball.y, ball.radius, 0, Math.PI * 2);
   ctx.fillStyle = 'white';
