@@ -44,14 +44,17 @@ let hexRadius = 200;
 let rotation = 0;
 let rotationSpeed = 0.01;
 const gravity = 0.2;
-const maxSpeed = 20;
+const maxSpeed = 30;
+
+let lastBounceTime = 0;
+const bounceCooldown = 100; // milliseconds
 
 let ball = {
   x: (Math.random() - 0.5) * 50,
   y: (Math.random() - 0.5) * 50,
   radius: 10,
-  vx: (Math.random() - 0.5) * 4 + (Math.random() - 0.5), // extra randomness
-  vy: (Math.random() - 0.5) * 4 + (Math.random() - 0.5)  // extra randomness
+  vx: (Math.random() - 0.5) * 4 + (Math.random() - 0.5),
+  vy: (Math.random() - 0.5) * 4 + (Math.random() - 0.5)
 };
 
 function clampVelocity(max) {
@@ -102,9 +105,11 @@ function reflectBall(normal) {
     ball.vx *= 0.98;
   }
 
-  if (bounceSound) {
+  const now = Date.now();
+  if (bounceSound && now - lastBounceTime > bounceCooldown) {
     bounceSound.currentTime = 0;
     bounceSound.play().catch(() => {});
+    lastBounceTime = now;
   }
 }
 
